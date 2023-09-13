@@ -1,2 +1,3 @@
 .env
-*.sql
+delete_statements.sql
+insert_statements.sql
