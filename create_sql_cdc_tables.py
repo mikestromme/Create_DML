@@ -1,4 +1,4 @@
-# output used in script F:\Xalt\Spectrum\TC1 Migration\DML\insert into spectrum enabled cdc table.sql
+# output used in script F:\Xalt\Spectrum\TC1 Migration\DDL\Deployment\Step 1 - insert into spectrum enabled cdc table.sql
 
 
 

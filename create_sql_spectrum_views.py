@@ -1,4 +1,4 @@
-# output used in script F:\Xalt\Spectrum\TC1 Migration\DML\insert into spectrum_view table.sql
+# output used in script F:\Xalt\Spectrum\TC1 Migration\DML\insert into spectrum_view table.sql - NOTE: THIS SCRIPT IS NOT NEEDED!!
 
 
 table_names = [

@@ -1,0 +1,1 @@
+INSERT INTO Forefront.dbo.DI_IMAGE_MASTER (Document_ID, Image_Path, Image_Filename, Create_Operator, Create_Date, Create_Time, Change_Operator, Change_Date, Change_Time, Image_Description) VALUES (84910, 'Z', 'Z', 'Z', GETDATE(), 'Z', 'Z', GETDATE(), 'Z', 'Z')

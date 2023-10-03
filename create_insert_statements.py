@@ -25,14 +25,14 @@ cursor = conn.cursor()
 
 
 # Read tables from the file
-with open('tables.txt', 'r') as file:
+with open('tables_test.txt', 'r') as file:
     tables = [line.strip() for line in file]
 
 # Define the table for which you want to generate test data
 #table_name = 'CR_CHANGE_ORDER_HEADER_MC'
 
 # Fetch column names and data types
-with open('insert_statements.sql', 'w') as output_file:
+with open('insert_statements_test.sql', 'w') as output_file:
     for table in tables:
         cursor.execute(f'SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?', table)
         columns = cursor.fetchall()
