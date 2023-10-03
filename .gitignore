@@ -1,3 +1,5 @@
 .env
 delete_statements.sql
 insert_statements.sql
+update_statements.sql
+select_statements.sql
