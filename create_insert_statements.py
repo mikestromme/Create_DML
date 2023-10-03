@@ -8,13 +8,14 @@ load_dotenv()
 server = os.getenv("db_server")
 db_user = os.getenv("azure_db_user")
 db_password = os.getenv("azure_db_password")
+database = os.getenv("database")
 
 
 # Establish a connection to your SQL Server
 # Connect to the appropriate db using ODBC Data Source
 driver = '{SQL Server}'
 server = server
-database = 'Forefront'
+database = database
 username = db_user
 password = db_password
 connection_string = 'driver=%s; server=%s; database=%s; uid=%s; pwd=%s' % (driver, server, database, username, password)
