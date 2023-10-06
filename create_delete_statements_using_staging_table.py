@@ -25,11 +25,11 @@ cursor = conn.cursor()
 
 
 # Read tables from a file
-with open('tables.txt', 'r') as file:
+with open('tables_test.txt', 'r') as file:
     tables = [line.strip() for line in file]
 
 # Fetch column names and data types create DML and write to file
-with open('delete_statements.sql', 'w') as output_file:
+with open('CRUD Files\\delete_statements_for_SSIS.sql', 'w') as output_file:
     for table in tables:
 
         # set staging table variable

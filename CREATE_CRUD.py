@@ -30,18 +30,24 @@ with open('tables_test.txt', 'r') as file:
     tables = [line.strip() for line in file]
 
 # Create output files for both INSERT and DELETE statements
-with open('insert_statements_test.sql', 'w') as insert_output_file, open('delete_statements_test.sql', 'w') as delete_output_file, open('update_statements_test.sql', 'w') as update_output_file, open('select_statements_test.sql', 'w') as select_output_file:
+with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, open('CRUD Files\\delete_statements_test.sql', 'w') as delete_output_file \
+    , open('CRUD Files\\update_statements_test.sql', 'w') as update_output_file, open('CRUD Files\\select_statements_test.sql', 'w') as select_output_file:
+    #select_output_file.write('-- each row should show 1 column with the value Z after the insert and U after the update' + '\n')
     for table in tables:
-        cursor.execute(f'SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?', table)
+        cursor.execute(f'SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?', table)        
         columns = cursor.fetchall()
 
         # Find the primary key columns
         cursor.execute(f"SELECT column_name FROM information_schema.key_column_usage WHERE constraint_name = 'PK_{table}'")
+        
         pk_columns = [row[0] for row in cursor.fetchall()]
 
         # Generate test values
         test_values = []
         unique_fields = {}
+
+        # Filter out identity columns
+        columns = [(col_name, col_type) for col_name, col_type in columns if not cursor.execute(f"SELECT COLUMNPROPERTY(object_id(?), ?, 'IsIdentity')", (table, col_name)).fetchone()[0]]
 
         for column in columns:
             column_name, data_type = column
@@ -102,6 +108,8 @@ with open('insert_statements_test.sql', 'w') as insert_output_file, open('delete
                     updated_value = str(random.randint(101, 200))
                 elif data_type == 'varchar':
                     updated_value = "'U'"
+                elif data_type == 'decimal':
+                    updated_value = 999.99 #str(random.randint(101, 200))
                 else:
                     updated_value = "'U'"
             update_statement = f"UPDATE Forefront.dbo.{table} SET {column_name} = {updated_value} WHERE {' AND '.join(delete_conditions)}"
