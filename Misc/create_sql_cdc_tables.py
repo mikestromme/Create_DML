@@ -1,4 +1,6 @@
-# output used in script F:\Xalt\Spectrum\TC1 Migration\DDL\Deployment\Step 1 - insert into spectrum enabled cdc table.sql
+# output used in script F:\Xalt\Spectrum\TC1 Migration\Deployment\Step 1 - insert into spectrum enabled cdc table.sql
+# this script inserts the table names into a table in xalt_prod that can be used to create the states table for Step 3
+
 
 
 

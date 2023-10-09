@@ -61,10 +61,15 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                 elif data_type == 'decimal':
                     test_value = str(round(random.uniform(0, 1000), 2))
                 else:
-                    test_value = f"'{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}'"
+                    if column_name == 'Company_Code':
+                        test_value = "'SUB'"
+                    elif column_name == 'Job_Number':
+                        test_value = "'12345678'"
+                    else:
+                        test_value = f"'{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}'"
                 unique_fields[column_name] = test_value
             elif column_name == 'Company_Code':
-                test_value = "'MJS'"
+                test_value = "'SUB'"
             elif column_name == 'Job_Number':
                 test_value = "'12345678'"
             elif column_name == 'Change_Order_Number':
