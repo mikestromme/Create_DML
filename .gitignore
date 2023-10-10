@@ -3,5 +3,9 @@ delete_statements_test.sql
 insert_statements_test.sql
 update_statements_test.sql
 select_statements_test.sql
+CREATE DELETE Tables.sql
+CREATE INSERT Tables.sql
+CREATE UPDATE Tables.sql
+delete_statements_for_SSIS.sql
 tables_test.txt
 tables.txt
