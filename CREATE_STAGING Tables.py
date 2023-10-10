@@ -26,12 +26,15 @@ cursor = conn.cursor()
 
 
 # Read tables from the file
-with open('tables_test.txt', 'r') as file:
+with open('tables.txt', 'r') as file:
     tables = [line.strip() for line in file]
 
 with open('CRUD Files\\CREATE INSERT Tables.sql', 'w') as output_file:
     for table in tables:
-        cursor.execute(f'SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= ?' , table)
+        cursor.execute(f'SELECT c.COLUMN_NAME, c.DATA_TYPE, c.CHARACTER_MAXIMUM_LENGTH, sc.precision AS NUMERIC_PRECISION, sc.scale AS NUMERIC_SCALE \
+                         FROM INFORMATION_SCHEMA.COLUMNS c \
+                           LEFT JOIN sys.columns sc ON c.COLUMN_NAME = sc.name \
+                         WHERE c.TABLE_NAME= ? AND sc.object_id = OBJECT_ID(?)' , table, table)
         columns = cursor.fetchall()
 
         # Construct the CREATE TABLE command based on the fetched structure.
@@ -39,7 +42,12 @@ with open('CRUD Files\\CREATE INSERT Tables.sql', 'w') as output_file:
         for column in columns:
             column_definition = f"{column.COLUMN_NAME} {column.DATA_TYPE}"
             if column.DATA_TYPE in ['char', 'varchar', 'nchar', 'nvarchar']:
-                column_definition += f"({column.CHARACTER_MAXIMUM_LENGTH})"
+                length = 'MAX' if column.CHARACTER_MAXIMUM_LENGTH == -1 else column.CHARACTER_MAXIMUM_LENGTH
+                column_definition += f"({length})"
+                #column_definition += f"({column.CHARACTER_MAXIMUM_LENGTH})"
+            # For decimal and numeric types
+            elif column.DATA_TYPE in ['decimal', 'numeric']: #and hasattr(column, 'NUMERIC_PRECISION') and hasattr(column, 'NUMERIC_SCALE'):
+                column_definition += f"({column.NUMERIC_PRECISION}, {column.NUMERIC_SCALE})"
             create_table_command += column_definition + ","
         create_table_command = create_table_command.rstrip(",") + ")"
 
@@ -49,7 +57,10 @@ with open('CRUD Files\\CREATE INSERT Tables.sql', 'w') as output_file:
 
 with open('CRUD Files\\CREATE UPDATE Tables.sql', 'w') as output_file:
     for table in tables:
-        cursor.execute(f'SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= ?' , table)
+        cursor.execute(f'SELECT c.COLUMN_NAME, c.DATA_TYPE, c.CHARACTER_MAXIMUM_LENGTH, sc.precision AS NUMERIC_PRECISION, sc.scale AS NUMERIC_SCALE \
+                         FROM INFORMATION_SCHEMA.COLUMNS c \
+                           LEFT JOIN sys.columns sc ON c.COLUMN_NAME = sc.name \
+                         WHERE c.TABLE_NAME= ? AND sc.object_id = OBJECT_ID(?)' , table, table)
         columns = cursor.fetchall()
 
         # Construct the CREATE TABLE command based on the fetched structure.
@@ -57,7 +68,12 @@ with open('CRUD Files\\CREATE UPDATE Tables.sql', 'w') as output_file:
         for column in columns:
             column_definition = f"{column.COLUMN_NAME} {column.DATA_TYPE}"
             if column.DATA_TYPE in ['char', 'varchar', 'nchar', 'nvarchar']:
-                column_definition += f"({column.CHARACTER_MAXIMUM_LENGTH})"
+                length = 'MAX' if column.CHARACTER_MAXIMUM_LENGTH == -1 else column.CHARACTER_MAXIMUM_LENGTH
+                column_definition += f"({length})"
+                #column_definition += f"({column.CHARACTER_MAXIMUM_LENGTH})"
+            # For decimal and numeric types
+            elif column.DATA_TYPE in ['decimal', 'numeric']: #and hasattr(column, 'NUMERIC_PRECISION') and hasattr(column, 'NUMERIC_SCALE'):
+                column_definition += f"({column.NUMERIC_PRECISION}, {column.NUMERIC_SCALE})"
             create_table_command += column_definition + ","
         create_table_command = create_table_command.rstrip(",") + ")"
 
@@ -66,7 +82,10 @@ with open('CRUD Files\\CREATE UPDATE Tables.sql', 'w') as output_file:
 
 with open('CRUD Files\\CREATE DELETE Tables.sql', 'w') as output_file:
     for table in tables:
-        cursor.execute(f'SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= ?' , table)
+        cursor.execute(f'SELECT c.COLUMN_NAME, c.DATA_TYPE, c.CHARACTER_MAXIMUM_LENGTH, sc.precision AS NUMERIC_PRECISION, sc.scale AS NUMERIC_SCALE \
+                         FROM INFORMATION_SCHEMA.COLUMNS c \
+                           LEFT JOIN sys.columns sc ON c.COLUMN_NAME = sc.name \
+                         WHERE c.TABLE_NAME= ? AND sc.object_id = OBJECT_ID(?)' , table, table)
         columns = cursor.fetchall()
 
         # Construct the CREATE TABLE command based on the fetched structure.
@@ -74,7 +93,12 @@ with open('CRUD Files\\CREATE DELETE Tables.sql', 'w') as output_file:
         for column in columns:
             column_definition = f"{column.COLUMN_NAME} {column.DATA_TYPE}"
             if column.DATA_TYPE in ['char', 'varchar', 'nchar', 'nvarchar']:
-                column_definition += f"({column.CHARACTER_MAXIMUM_LENGTH})"
+                length = 'MAX' if column.CHARACTER_MAXIMUM_LENGTH == -1 else column.CHARACTER_MAXIMUM_LENGTH
+                column_definition += f"({length})"
+                #column_definition += f"({column.CHARACTER_MAXIMUM_LENGTH})"
+            # For decimal and numeric types
+            elif column.DATA_TYPE in ['decimal', 'numeric']: #and hasattr(column, 'NUMERIC_PRECISION') and hasattr(column, 'NUMERIC_SCALE'):
+                column_definition += f"({column.NUMERIC_PRECISION}, {column.NUMERIC_SCALE})"
             create_table_command += column_definition + ","
         create_table_command = create_table_command.rstrip(",") + ")"
 
