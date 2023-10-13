@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 import random
 
+start_time = datetime.now()
+
 load_dotenv()
 server = os.getenv("db_server")
 db_user = os.getenv("azure_db_user")
@@ -26,7 +28,7 @@ cursor = conn.cursor()
 
 
 # Read tables from the file
-with open('tables_test.txt', 'r') as file:
+with open('tables.txt', 'r') as file:
     tables = [line.strip() for line in file]
 
 # Create output files for both INSERT and DELETE statements
@@ -38,9 +40,13 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
         columns = cursor.fetchall()
 
         # Find the primary key columns
-        cursor.execute(f"SELECT column_name FROM information_schema.key_column_usage WHERE constraint_name = 'PK_{table}'")
-        
+        cursor.execute(f"SELECT column_name FROM information_schema.key_column_usage WHERE constraint_name = 'PK_{table}'")               
         pk_columns = [row[0] for row in cursor.fetchall()]
+
+        # get pkeys where constraint name doesn't match the table name
+        if len(pk_columns) == 0:    
+            cursor.execute(f"SELECT column_name FROM information_schema.key_column_usage WHERE table_name = '{table}'")         
+            pk_columns = [row[0] for row in cursor.fetchall()]
 
         # Generate test values
         test_values = []
@@ -62,14 +68,14 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     test_value = str(round(random.uniform(0, 1000), 2))
                 else:
                     if column_name == 'Company_Code':
-                        test_value = "'SUB'"
+                        test_value = "'MJS'"
                     elif column_name == 'Job_Number':
                         test_value = "'12345678'"
                     else:
-                        test_value = f"'{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}'"
+                        test_value = "'Z'" # f"'{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}'"
                 unique_fields[column_name] = test_value
             elif column_name == 'Company_Code':
-                test_value = "'SUB'"
+                test_value = "'MJS'"
             elif column_name == 'Job_Number':
                 test_value = "'12345678'"
             elif column_name == 'Change_Order_Number':
@@ -100,7 +106,7 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
         
 
         # Create the DELETE statement
-        if unique_fields:  # Only create DELETE if we have unique (Primary Key) fields
+        if unique_fields:  # Only create DELETE, Update and select if we have unique (Primary Key) fields
             delete_conditions = [f"{key} = {value}" for key, value in unique_fields.items()]
             delete_statement = f"DELETE FROM Forefront.dbo.{table} WHERE {' AND '.join(delete_conditions)}"
             delete_output_file.write(delete_statement + '\n')
@@ -128,10 +134,72 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
             print(select_statement)
             select_output_file.write(select_statement + '\n')
         else: 
-            delete_output_file.write(f"-- No unique fields found for table {table}, skipping DELETE statement.\n")
-            update_output_file.write(f"-- No unique fields found for table {table}, skipping UPDATE statement.\n")
-            select_output_file.write(f"-- No unique fields found for table {table}, skipping SELECT statement.\n")
+            #delete_output_file.write(f"-- No unique fields found for table {table}, skipping DELETE statement.\n")
+            #update_output_file.write(f"-- No unique fields found for table {table}, skipping UPDATE statement.\n")
+            #select_output_file.write(f"-- No unique fields found for table {table}, skipping SELECT statement.\n")
+
+            
+            non_unique_values = {}
+
+            # Store values for the first 3 columns that were inserted (or however many you deem necessary)
+            first_few_values = test_values[:3]
+            non_unique_values[table] = first_few_values
+
+            # Generate UPDATE Statement
+            # first_value = first_few_values[0]
+            # update_statement = f"UPDATE TOP (1) Forefront.dbo.{table} SET {columns[0][0]} = {first_value} WHERE {conditions}"
+            # update_output_file.write(update_statement + '\n')
+            
+            first_few_columns = ", ".join(col[0] for col in columns[:3])  # Choose the first 3 columns as example
+            conditions = " AND ".join(f"{col[0]} = {val}" for col, val in zip(columns[:3], first_few_values))
+
+            # Generate DELETE Statement
+            delete_statement = f"DELETE TOP (1) FROM Forefront.dbo.{table} WHERE {conditions}"
+            delete_output_file.write(delete_statement + '\n')
+
+            # Generate UPDATE Statement
+            first_value = first_few_values[0]
+            update_statement = f"UPDATE TOP (1) Forefront.dbo.{table} SET {columns[0][0]} = {first_value} WHERE {conditions}"
+            update_output_file.write(update_statement + '\n')
+
+            # Generate SELECT Statement
+            select_statement = f"SELECT TOP (1) * FROM Forefront.dbo.{table} WHERE {conditions}"
+            select_output_file.write(select_statement + '\n')
+            
+
+
+# Define the names of the files to read and the output file
+input_files = ['CRUD Files\\insert_statements_test.sql', 'CRUD Files\\update_statements_test.sql', 'CRUD Files\\delete_statements_test.sql']
+output_file = 'CRUD Files\\CRUD.sql'
+
+# Open the output file for writing
+with open(output_file, 'w') as output:
+    # Iterate through each input file
+    for file_name in input_files:
+        # Open the input file for reading
+        with open(file_name, 'r') as f:
+            # Read content and write it to the output file
+            content = f.read()
+
+            if file_name == 'CRUD Files\\update_statements_test.sql' or file_name == 'CRUD Files\\delete_statements_test.sql':
+                output.write('/*\n\n')
+                output.write(content)
+                output.write('\n*/')
+            else:
+                output.write(content)
+                
+        # Add newlines between each file content
+        output.write('\n\n')
 
 # Close connections
 cursor.close()
 conn.close()
+
+
+stop_time = datetime.now()
+duration = stop_time - start_time
+
+print('\n\n\n')
+print(f"Start Time: {start_time}")
+print(f"Stop Time: {stop_time}")
+print(f"Duration: {duration}")
