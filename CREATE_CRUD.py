@@ -28,7 +28,7 @@ cursor = conn.cursor()
 
 
 # Read tables from the file
-with open('tables.txt', 'r') as file:
+with open('tables_test.txt', 'r') as file:
     tables = [line.strip() for line in file]
 
 # Create output files for both INSERT and DELETE statements
