@@ -66,6 +66,7 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     test_value = 'GETDATE()'
                 elif data_type == 'decimal':
                     test_value = str(round(random.uniform(0, 1000), 2))
+                
                 else:
                     if column_name == 'Company_Code':
                         test_value = "'MJS'"
@@ -82,6 +83,7 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                 test_value = "'87654321'"
             elif column_name == 'Customer_Code':
                 test_value = "'100000'"
+            
             else:
                 if data_type == 'datetime':
                     test_value = 'GETDATE()' 
@@ -89,6 +91,11 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     test_value = str(round(random.uniform(0, 1000), 2))
                 elif data_type == 'bigint':
                     test_value = str(random.randint(0, 100000))
+                elif data_type == 'int':
+                    test_value = str(random.randint(0, 100))
+                elif data_type == 'uniqueidentifier':
+                    test_value = "NEWID()"
+
                 else:
                     test_value = "'Z'"
 
@@ -121,6 +128,8 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     updated_value = "'U'"
                 elif data_type == 'decimal':
                     updated_value = 999.99 #str(random.randint(101, 200))
+                elif data_type == 'datetime':
+                    updated_value = 'GETDATE()'
                 else:
                     updated_value = "'U'"
             update_statement = f"UPDATE Forefront.dbo.{table} SET {column_name} = {updated_value} WHERE {' AND '.join(delete_conditions)}"
