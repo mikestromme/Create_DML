@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-import random
+import binascii
 
 start_time = datetime.now()
 
@@ -63,10 +63,11 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                 elif data_type == 'bigint':
                     test_value = str(random.randint(0, 100000))
                 elif data_type == 'datetime':
-                    test_value = 'GETDATE()'
+                    test_value = 'CAST(GETDATE() AS DATE)'
                 elif data_type == 'decimal':
                     test_value = str(round(random.uniform(0, 1000), 2))
-                
+                elif data_type == 'varchar' and column_name == 'Transaction_Date':
+                    test_value = "'20231026'"
                 else:
                     if column_name == 'Company_Code':
                         test_value = "'MJS'"
@@ -86,7 +87,7 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
             
             else:
                 if data_type == 'datetime':
-                    test_value = 'GETDATE()' 
+                    test_value = 'CAST(GETDATE() AS DATE)' 
                 elif data_type == 'decimal':
                     test_value = str(round(random.uniform(0, 1000), 2))
                 elif data_type == 'bigint':
@@ -95,6 +96,9 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     test_value = str(random.randint(0, 100))
                 elif data_type == 'uniqueidentifier':
                     test_value = "NEWID()"
+                elif data_type == 'varbinary':  
+                    test_value = f"0x{binascii.hexlify(bytes([random.randint(0, 100)])).decode('utf-8').upper()}"
+
 
                 else:
                     test_value = "'Z'"
@@ -129,9 +133,11 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                 elif data_type == 'decimal':
                     updated_value = 999.99 #str(random.randint(101, 200))
                 elif data_type == 'datetime':
-                    updated_value = 'GETDATE()'
+                    updated_value = 'CAST(GETDATE() as DATE)'
                 else:
                     updated_value = "'U'"
+            else:
+                updated_value = 'M'
             update_statement = f"UPDATE Forefront.dbo.{table} SET {column_name} = {updated_value} WHERE {' AND '.join(delete_conditions)}"
             print(update_statement)
             update_output_file.write(update_statement + '\n')
