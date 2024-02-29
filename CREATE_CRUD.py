@@ -13,6 +13,8 @@ db_user = os.getenv("azure_db_user")
 db_password = os.getenv("azure_db_password")
 database = os.getenv("database")
 
+random_company_code = 'STR'
+
 
 # Establish a connection to your SQL Server
 # Connect to the appropriate db using ODBC Data Source
@@ -66,24 +68,25 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     test_value = 'CAST(GETDATE() AS DATE)'
                 elif data_type == 'decimal':
                     test_value = str(round(random.uniform(0, 1000), 2))
-                elif data_type == 'varchar' and column_name == 'Transaction_Date':
+                elif data_type == 'varchar' and (column_name == 'Transaction_Date' or column_name == 'Period_End_Date'): # added for triggers TRG_INS_UPD_JC_QUANTITY_HISTORY_MC and some other one
                     test_value = "'20231026'"
                 else:
                     if column_name == 'Company_Code':
-                        test_value = "'MJS'"
+                        test_value = "'" + random_company_code + "'"
                     elif column_name == 'Job_Number':
                         test_value = "'12345678'"
                     else:
                         test_value = "'Z'" # f"'{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}'"
                 unique_fields[column_name] = test_value
             elif column_name == 'Company_Code':
-                test_value = "'MJS'"
+                test_value = "'" + random_company_code + "'"
             elif column_name == 'Job_Number':
                 test_value = "'12345678'"
             elif column_name == 'Change_Order_Number':
                 test_value = "'87654321'"
             elif column_name == 'Customer_Code':
                 test_value = "'100000'"
+            
             
             else:
                 if data_type == 'datetime':
@@ -98,6 +101,7 @@ with open('CRUD Files\\insert_statements_test.sql', 'w') as insert_output_file, 
                     test_value = "NEWID()"
                 elif data_type == 'varbinary':  
                     test_value = f"0x{binascii.hexlify(bytes([random.randint(0, 100)])).decode('utf-8').upper()}"
+                
 
 
                 else:
